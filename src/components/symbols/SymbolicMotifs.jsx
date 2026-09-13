@@ -20,12 +20,14 @@ export const ThreadMotif = ({
           bottom: '25vh',
           left: '50%',
           transform: 'translateX(-50%)',
-          width: '1000px',
+          width: '100%',
+          maxWidth: '1000px',
           height: '60px',
           pointerEvents: 'none',
           zIndex: 25
         }}
         viewBox="-500 -30 1000 60"
+        preserveAspectRatio="xMidYMid meet"
       >
         <path
           d={`M ${manX} 0 Q ${manX + 60} 15, ${manX + 120} 25`}
@@ -58,12 +60,14 @@ export const ThreadMotif = ({
         bottom: '25vh',
         left: '50%',
         transform: 'translateX(-50%)',
-        width: '1200px',
+        width: '100%',
+        maxWidth: '1200px',
         height: '100px',
         pointerEvents: 'none',
         zIndex: 25
       }}
       viewBox="-600 -20 1200 100"
+      preserveAspectRatio="xMidYMid meet"
     >
       <defs>
         <linearGradient id="threadGlowGrad" x1="0" y1="0" x2="1" y2="0">

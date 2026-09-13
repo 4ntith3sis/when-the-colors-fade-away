@@ -75,11 +75,11 @@ export const StoryStage = () => {
       // Calculate responsive screen factor so character horizontal separation scales with viewport width
       let screenFactor = 1.0;
       if (windowW < 1200) {
-        screenFactor = Math.max(0.32, windowW / 1200);
+        screenFactor = Math.max(0.24, Math.min(1.0, windowW / 1200));
       }
 
-      // Calculate character scale multiplier for smaller mobile screens
-      const mobileScaleMult = windowW < 480 ? 0.72 : windowW < 768 ? 0.85 : 1.0;
+      // Fine-grained character scale multiplier across all screen breakpoints
+      const mobileScaleMult = windowW < 360 ? 0.62 : windowW < 480 ? 0.72 : windowW < 768 ? 0.84 : windowW < 1024 ? 0.92 : 1.0;
 
       // Normalized Progress (0.0 -> 1.0)
       const rawProgress = Math.min(1, Math.max(0, scrollY / maxScroll));

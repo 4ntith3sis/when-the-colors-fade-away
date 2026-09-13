@@ -45,10 +45,11 @@ html {
   width: 100%;
   height: auto;
   min-height: 100%;
+  max-width: 100vw;
   background-color: #0D0E10;
   color: var(--color-text-cream);
   font-family: var(--font-sans);
-  overflow-x: hidden;
+  overflow-x: clip;
   overflow-y: auto;
   scroll-behavior: auto;
   -webkit-font-smoothing: antialiased;
@@ -66,14 +67,23 @@ body::-webkit-scrollbar {
 
 body {
   width: 100%;
+  max-width: 100vw;
   min-height: 100vh;
+  min-height: 100svh;
   min-height: 100dvh;
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  overflow-x: clip;
   background-color: #0D0E10;
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+/* Global Media & SVG Responsive Standard */
+img, video, canvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
 
 /* Paper Grain Texture Overlay */
@@ -83,7 +93,9 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
+  height: 100svh;
   height: 100dvh;
+  max-width: 100%;
   pointer-events: none;
   z-index: 9999;
   opacity: 0.22;
@@ -97,6 +109,7 @@ body {
   width: 100%;
   height: 1200vh;
   background-color: #0D0E10;
+  overflow-x: clip;
 }
 
 /* Locked Viewport Stage Camera (Fixed 100vw x 100vh / 100dvh) */
@@ -106,7 +119,9 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
+  height: 100svh;
   height: 100dvh;
+  max-width: 100%;
   overflow: hidden;
   filter: var(--monochrome-filter);
   will-change: filter, transform;
@@ -116,12 +131,14 @@ body {
 .narrative-basquiat-title {
   font-family: var(--font-narrative);
   font-weight: 400;
-  font-size: clamp(1.3rem, 3.2vw, 2.5rem);
-  line-height: 1.25;
+  font-size: clamp(1.2rem, 3.2vw, 2.5rem);
+  line-height: 1.28;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: currentColor;
   will-change: transform, opacity;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Common Parallax Layer */
@@ -148,8 +165,8 @@ body {
 /* Audio Toggle Button Styling */
 .ambient-audio-btn {
   position: fixed;
-  top: 28px;
-  right: 36px;
+  top: max(28px, env(safe-area-inset-top));
+  right: max(36px, env(safe-area-inset-right));
   z-index: 9000;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -159,6 +176,8 @@ body {
   border-radius: 50%;
   width: 44px;
   height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -200,6 +219,7 @@ body {
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: auto;
+  min-height: 44px;
 }
 
 .replay-btn:hover {
@@ -229,8 +249,8 @@ body {
 /* Minimal Right-Side Scroll Indicator */
 .scroll-indicator-container {
   position: fixed;
-  right: 5vw;
-  bottom: 64px;
+  right: max(5vw, env(safe-area-inset-right));
+  bottom: max(64px, env(safe-area-inset-bottom));
   z-index: 9000;
   pointer-events: none;
   display: flex;
@@ -258,56 +278,83 @@ body {
   }
 }
 
-/* RESPONSIVE MEDIA QUERIES FOR TABLETS & PHONES */
-@media (max-width: 1024px) {
-  .ambient-audio-btn {
-    top: 20px;
-    right: 24px;
-  }
-  .scroll-indicator-container {
-    right: 4vw !important;
-    bottom: 48px !important;
+/* RESPONSIVE MEDIA QUERIES FOR DESKTOPS, TABLETS & PHONES */
+
+/* Large Screens & 4K (1441px+) */
+@media (min-width: 1441px) {
+  .storybook-narrative-overlay {
+    max-width: 780px;
   }
 }
 
+/* Standard Laptop / Mid Desktop (1025px - 1440px) */
+@media (max-width: 1280px) {
+  .ambient-audio-btn {
+    top: 24px;
+    right: 28px;
+  }
+}
+
+/* Tablet Screens (769px - 1024px) */
+@media (max-width: 1024px) {
+  .ambient-audio-btn {
+    top: max(20px, env(safe-area-inset-top));
+    right: max(24px, env(safe-area-inset-right));
+  }
+  .scroll-indicator-container {
+    right: max(4vw, env(safe-area-inset-right)) !important;
+    bottom: max(48px, env(safe-area-inset-bottom)) !important;
+  }
+  .storybook-narrative-overlay {
+    width: 86% !important;
+    max-width: 600px;
+  }
+  .narrative-basquiat-title {
+    font-size: clamp(1.2rem, 3.6vw, 2.1rem);
+  }
+}
+
+/* Mobile & Small Tablets (320px - 768px) */
 @media (max-width: 768px) {
-  /* On Mobile & Tablet Screens, force narrative text overlay to remain cleanly centered */
+  /* On Mobile Screens, center narrative text overlay to ensure zero horizontal truncation */
   .storybook-narrative-overlay {
     left: 50% !important;
-    top: 10% !important;
+    top: max(10%, calc(env(safe-area-inset-top) + 24px)) !important;
     transform: translateX(-50%) !important;
     text-align: center !important;
     width: 92% !important;
   }
 
   .narrative-basquiat-title {
-    font-size: clamp(1.1rem, 4.5vw, 1.6rem);
+    font-size: clamp(1.05rem, 4.4vw, 1.6rem);
     line-height: 1.35;
     letter-spacing: 0.05em;
   }
 
   .character-stage-wrapper {
     height: 58vh !important;
+    height: 58svh !important;
     padding-bottom: 8vh !important;
   }
 }
 
+/* Mobile Phones (320px - 640px) */
 @media (max-width: 640px) {
   .ambient-audio-btn {
-    top: 16px;
-    right: 16px;
-    width: 38px;
-    height: 38px;
+    top: max(16px, env(safe-area-inset-top));
+    right: max(16px, env(safe-area-inset-right));
+    width: 44px;
+    height: 44px;
   }
 
   .scroll-indicator-container {
-    right: 4vw !important;
-    bottom: 28px !important;
+    right: max(4vw, env(safe-area-inset-right)) !important;
+    bottom: max(28px, env(safe-area-inset-bottom)) !important;
     gap: 6px !important;
   }
   
   .scroll-indicator-container span {
-    font-size: 0.62rem !important;
+    font-size: 0.64rem !important;
     letter-spacing: 0.1em !important;
   }
 
@@ -317,22 +364,61 @@ body {
   }
 }
 
-/* MOBILE LANDSCAPE SUPPORT (e.g. phones rotated horizontally) */
-@media (max-height: 500px) and (orientation: landscape) {
-  .storybook-narrative-overlay {
-    top: 5% !important;
-  }
-
-  .narrative-basquiat-title {
-    font-size: clamp(0.95rem, 3.5vh, 1.3rem);
-  }
-
+/* Ultra Small Mobile Screens (320px - 360px) */
+@media (max-width: 360px) {
   .ambient-audio-btn {
-    top: 10px;
+    top: max(12px, env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
   }
 
   .scroll-indicator-container {
-    bottom: 16px !important;
+    right: max(3vw, env(safe-area-inset-right)) !important;
+    bottom: max(20px, env(safe-area-inset-bottom)) !important;
+    gap: 4px !important;
+  }
+
+  .scroll-indicator-container span {
+    font-size: 0.58rem !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  .narrative-basquiat-title {
+    font-size: clamp(0.95rem, 5vw, 1.25rem);
+    line-height: 1.3;
+  }
+
+  .replay-btn {
+    padding: 10px 22px;
+    font-size: 0.7rem;
+  }
+}
+
+/* MOBILE LANDSCAPE SUPPORT (e.g. phones rotated horizontally) */
+@media (max-height: 500px) and (orientation: landscape) {
+  .storybook-narrative-overlay {
+    top: max(4%, env(safe-area-inset-top)) !important;
+    width: 88% !important;
+  }
+
+  .narrative-basquiat-title {
+    font-size: clamp(0.9rem, 3.8vh, 1.3rem);
+    line-height: 1.25;
+  }
+
+  .ambient-audio-btn {
+    top: max(10px, env(safe-area-inset-top));
+    right: max(14px, env(safe-area-inset-right));
+    width: 38px;
+    height: 38px;
+  }
+
+  .scroll-indicator-container {
+    bottom: max(14px, env(safe-area-inset-bottom)) !important;
+  }
+
+  .character-stage-wrapper {
+    height: 52vh !important;
+    padding-bottom: 4vh !important;
   }
 }
 

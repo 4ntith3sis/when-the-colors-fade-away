@@ -5,7 +5,7 @@ import { CandleMotif, ThreadMotif, FlowersMotif, BranchesMotif } from '../symbol
 // Visual Metaphor: Thin thread & small warm candle flame between far-apart characters
 export const Scene1Environment = () => (
   <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" className="w-full h-full" style={{ position: 'absolute', inset: 0 }}>
+    <svg viewBox="0 0 1440 900" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0 }}>
       {/* Dark Forest Glade Background */}
       <rect width="1440" height="900" fill="#23261F" />
       
@@ -43,7 +43,7 @@ export const Scene1Environment = () => (
 // Visual Metaphor: Warm atmospheric sanctuary, stable candle, stylized flowers
 export const Scene2Environment = () => (
   <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" className="w-full h-full" style={{ position: 'absolute', inset: 0 }}>
+    <svg viewBox="0 0 1440 900" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0 }}>
       <rect width="1440" height="900" fill="#2B2820" />
       
       {/* Warm Golden Sanctuary Glow */}
@@ -82,7 +82,7 @@ export const Scene2Environment = () => (
 // Visual Metaphor: Flickering flame, encroaching dark branches, loosening thread
 export const Scene3Environment = () => (
   <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" className="w-full h-full" style={{ position: 'absolute', inset: 0 }}>
+    <svg viewBox="0 0 1440 900" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0 }}>
       <rect width="1440" height="900" fill="#1E221D" />
 
       {/* Shadowy Cold Ambient Tint */}
@@ -121,7 +121,7 @@ export const Scene3Environment = () => (
 // Visual Metaphor: Snapped thread, extinguished candle smoke, empty diverging paths
 export const Scene4Environment = () => (
   <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" className="w-full h-full" style={{ position: 'absolute', inset: 0 }}>
+    <svg viewBox="0 0 1440 900" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0 }}>
       <rect width="1440" height="900" fill="#1A1B1A" />
 
       {/* Forked Road Silhouette */}
@@ -152,7 +152,7 @@ export const Scene4Environment = () => (
 // Visual Metaphor: No characters, empty room, empty chair, window beam, extinguished candle
 export const Scene5Environment = () => (
   <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" className="w-full h-full" style={{ position: 'absolute', inset: 0 }}>
+    <svg viewBox="0 0 1440 900" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0 }}>
       <rect width="1440" height="900" fill="#15181C" />
 
       {/* Architectural Room Window Silhouette */}
@@ -191,7 +191,7 @@ export const Scene5Environment = () => (
 // Visual Metaphor: Dark night road, moon, headlight sweep, extinguished candle
 export const Scene6Environment = ({ sweepProgress = 0 }) => (
   <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" className="w-full h-full" style={{ position: 'absolute', inset: 0 }}>
+    <svg viewBox="0 0 1440 900" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0 }}>
       <rect width="1440" height="900" fill="#111419" />
 
       {/* Moon Silhouette */}
@@ -228,7 +228,7 @@ export const Scene6Environment = ({ sweepProgress = 0 }) => (
 // Visual Metaphor: Continuous layered journey through dark forest, monumental gate, floating guide lights
 export const Scene7Environment = ({ journeyOffset = 0 }) => (
   <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" className="w-full h-full" style={{ position: 'absolute', inset: 0 }}>
+    <svg viewBox="0 0 1440 900" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0 }}>
       <rect width="1440" height="900" fill="#131820" />
 
       {/* Panning World Layer */}
@@ -261,7 +261,7 @@ export const Scene7Environment = ({ journeyOffset = 0 }) => (
 // Visual Metaphor: Cliff/pier threshold, huge negative space, single extinguished candle, man tiny
 export const Scene8Environment = () => (
   <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" className="w-full h-full" style={{ position: 'absolute', inset: 0 }}>
+    <svg viewBox="0 0 1440 900" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0 }}>
       <rect width="1440" height="900" fill="#16171B" />
 
       {/* Cold Horizon */}
@@ -290,7 +290,7 @@ export const Scene8Environment = () => (
 // Visual Metaphor: Color -> Absence, Movement -> Stillness, Memory Fragments, Everything -> Nothing
 export const SceneMonoEnvironment = ({ sceneId }) => (
   <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-    <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" className="w-full h-full" style={{ position: 'absolute', inset: 0 }}>
+    <svg viewBox="0 0 1440 900" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0 }}>
       <rect width="1440" height="900" fill="#121315" />
 
       {/* Stark Minimalist Echoes */}

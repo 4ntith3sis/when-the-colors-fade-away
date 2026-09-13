@@ -79,6 +79,7 @@ export const AmbientAudio = ({ isMonochrome = false }) => {
       onClick={toggleAudio}
       className="ambient-audio-btn"
       title="Toggle Atmospheric Soundscape"
+      aria-label={isPlaying ? "Mute atmospheric soundscape" : "Play atmospheric soundscape"}
     >
       {isPlaying ? <Volume2 size={18} /> : <VolumeX size={18} opacity={0.6} />}
     </button>
