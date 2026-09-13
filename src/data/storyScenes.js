@@ -1,0 +1,146 @@
+export const STORY_SCENES = [
+  {
+    id: 1,
+    key: "the-two",
+    numStr: "01",
+    title: "THE TWO",
+    narrative: "We found each other.",
+    align: "center",
+    bgColor: "#23261F",
+    textColor: "#E5DDD0",
+    isMonochrome: false,
+    camera: { zoom: 1, x: 0, y: 0 }
+  },
+  {
+    id: 2,
+    key: "together",
+    numStr: "02",
+    title: "TOGETHER",
+    narrative: "For a while.",
+    align: "left",
+    bgColor: "#2B2820",
+    textColor: "#F4E2AC",
+    isMonochrome: false,
+    camera: { zoom: 1.15, x: 0, y: 0 }
+  },
+  {
+    id: 3,
+    key: "the-argument",
+    numStr: "03",
+    title: "THE ARGUMENT",
+    narrative: "Something changed.",
+    align: "center",
+    bgColor: "#1E221D",
+    textColor: "#D4C8B8",
+    isMonochrome: false,
+    camera: { zoom: 1, x: 0, y: 0 }
+  },
+  {
+    id: 4,
+    key: "the-separation",
+    numStr: "04",
+    title: "THE SEPARATION",
+    narrative: "We stopped listening.",
+    align: "right",
+    bgColor: "#1A1B1A",
+    textColor: "#C8BEB0",
+    isMonochrome: false,
+    camera: { zoom: 0.9, x: 0, y: 0 }
+  },
+  {
+    id: 5,
+    key: "empty-space",
+    numStr: "05",
+    title: "THE EMPTY SPACE",
+    narrative: "Then, everything changed.",
+    align: "center",
+    bgColor: "#15181C",
+    textColor: "#E2D7C8",
+    isMonochrome: false,
+    camera: { zoom: 1.1, x: 0, y: 0 }
+  },
+  {
+    id: 6,
+    key: "shes-gone",
+    numStr: "06",
+    title: "SHE'S GONE",
+    narrative: "She was gone.",
+    align: "left",
+    bgColor: "#111419",
+    textColor: "#DCD7D0",
+    isMonochrome: false,
+    camera: { zoom: 1, x: 0, y: 0 }
+  },
+  {
+    id: 7,
+    key: "the-search",
+    numStr: "07",
+    title: "THE SEARCH",
+    narrative: "I kept searching.",
+    align: "center",
+    bgColor: "#131820",
+    textColor: "#E0E0E0",
+    isMonochrome: false,
+    camera: { zoom: 1, x: 0, y: 0 }
+  },
+  {
+    id: 8,
+    key: "too-late",
+    numStr: "08",
+    title: "TOO LATE",
+    narrative: "Too late.",
+    align: "center",
+    bgColor: "#16171B",
+    textColor: "#CCCCCC",
+    isMonochrome: false,
+    camera: { zoom: 0.75, x: 0, y: 0 }
+  },
+  {
+    id: 9,
+    key: "world-changes",
+    numStr: "09",
+    title: "THE WORLD CHANGES",
+    narrative: "I understood.",
+    align: "center",
+    bgColor: "#141518",
+    textColor: "#C0C0C0",
+    isMonochrome: true, // Color transition boundary
+    camera: { zoom: 1, x: 0, y: 0 }
+  },
+  {
+    id: 10,
+    key: "after",
+    numStr: "10",
+    title: "AFTER",
+    narrative: "After.",
+    align: "center",
+    bgColor: "#121315",
+    textColor: "#B8B8B8",
+    isMonochrome: true,
+    camera: { zoom: 0.85, x: 0, y: 0 }
+  },
+  {
+    id: 11,
+    key: "memory",
+    numStr: "11",
+    title: "MEMORY",
+    narrative: "Some things remain.",
+    align: "right",
+    bgColor: "#101113",
+    textColor: "#AAAAAA",
+    isMonochrome: true,
+    camera: { zoom: 1, x: 0, y: 0 }
+  },
+  {
+    id: 12,
+    key: "the-end",
+    numStr: "12",
+    title: "THE END",
+    narrative: "Some stories end.",
+    align: "center",
+    bgColor: "#0D0E10",
+    textColor: "#E0E0E0",
+    isMonochrome: true,
+    camera: { zoom: 0.7, x: 0, y: 0 }
+  }
+];

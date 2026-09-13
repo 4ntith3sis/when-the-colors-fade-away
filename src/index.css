@@ -1,0 +1,339 @@
+@font-face {
+  font-family: 'Basquiat Irregular Wide';
+  src: url('/fonts/Basquiat%20Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Basquiat';
+  src: url('/fonts/Basquiat%20Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --color-bg-forest: #23261F;
+  --color-bg-amber: #2B2820;
+  --color-bg-dark-olive: #1E221D;
+  --color-bg-slate: #1A1B1A;
+  --color-bg-charcoal: #15181C;
+  --color-bg-night: #111419;
+  --color-bg-void: #0D0E10;
+
+  --color-text-cream: #E5DDD0;
+  --color-text-parchment: #D4C8B8;
+  --color-text-ivory: #F4E2AC;
+  --color-text-amber: #E8A048;
+  --color-text-muted: #8C847C;
+
+  --font-narrative: 'Basquiat Irregular Wide', 'Basquiat', sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  --monochrome-filter: grayscale(0%);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  width: 100%;
+  height: auto;
+  min-height: 100%;
+  background-color: #0D0E10;
+  color: var(--color-text-cream);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-behavior: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background-color: #0D0E10;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Paper Grain Texture Overlay */
+.editorial-grain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.22;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Scroll Container Track (Provides Virtual Scroll Distance) */
+.scroll-container {
+  position: relative;
+  width: 100%;
+  height: 1200vh;
+  background-color: #0D0E10;
+}
+
+/* Locked Viewport Stage Camera (Fixed 100vw x 100vh / 100dvh) */
+.cinematic-stage {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  filter: var(--monochrome-filter);
+  will-change: filter, transform;
+}
+
+/* Basquiat Irregular Wide Narrative Typography Class */
+.narrative-basquiat-title {
+  font-family: var(--font-narrative);
+  font-weight: 400;
+  font-size: clamp(1.3rem, 3.2vw, 2.5rem);
+  line-height: 1.25;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: currentColor;
+  will-change: transform, opacity;
+}
+
+/* Common Parallax Layer */
+.parallax-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* Storybook Narrative Overlay Container */
+.storybook-narrative-overlay {
+  position: absolute;
+  width: 90%;
+  max-width: 680px;
+  z-index: 50;
+  pointer-events: none;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s ease-out;
+}
+
+/* Audio Toggle Button Styling */
+.ambient-audio-btn {
+  position: fixed;
+  top: 28px;
+  right: 36px;
+  z-index: 9000;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #F4EFEA;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+}
+
+.ambient-audio-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
+}
+
+/* Top Progress Bar Track */
+.progress-indicator-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #E8A048 0%, #F4E2AC 50%, #E5DDD0 100%);
+  z-index: 9999;
+  pointer-events: none;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 10px rgba(232, 160, 72, 0.5);
+}
+
+/* Buttons & Action Controls */
+.replay-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #E5DDD0;
+  padding: 14px 36px;
+  font-family: var(--font-narrative);
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto;
+}
+
+.replay-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.8);
+  transform: translateY(-2px);
+}
+
+/* Debug HUD indicator */
+.debug-hud {
+  position: fixed;
+  bottom: 24px;
+  left: 36px;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: #00FF88;
+  pointer-events: none;
+  letter-spacing: 0.05em;
+}
+
+/* Minimal Right-Side Scroll Indicator */
+.scroll-indicator-container {
+  position: fixed;
+  right: 5vw;
+  bottom: 64px;
+  z-index: 9000;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(238, 230, 218, 0.75);
+}
+
+.scroll-indicator-dot {
+  animation: scrollWheelMove 2.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+@keyframes scrollWheelMove {
+  0% {
+    transform: translateY(0);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 0.2;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0.9;
+  }
+}
+
+/* RESPONSIVE MEDIA QUERIES FOR TABLETS & PHONES */
+@media (max-width: 1024px) {
+  .ambient-audio-btn {
+    top: 20px;
+    right: 24px;
+  }
+  .scroll-indicator-container {
+    right: 4vw !important;
+    bottom: 48px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* On Mobile & Tablet Screens, force narrative text overlay to remain cleanly centered */
+  .storybook-narrative-overlay {
+    left: 50% !important;
+    top: 10% !important;
+    transform: translateX(-50%) !important;
+    text-align: center !important;
+    width: 92% !important;
+  }
+
+  .narrative-basquiat-title {
+    font-size: clamp(1.1rem, 4.5vw, 1.6rem);
+    line-height: 1.35;
+    letter-spacing: 0.05em;
+  }
+
+  .character-stage-wrapper {
+    height: 58vh !important;
+    padding-bottom: 8vh !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .ambient-audio-btn {
+    top: 16px;
+    right: 16px;
+    width: 38px;
+    height: 38px;
+  }
+
+  .scroll-indicator-container {
+    right: 4vw !important;
+    bottom: 28px !important;
+    gap: 6px !important;
+  }
+  
+  .scroll-indicator-container span {
+    font-size: 0.62rem !important;
+    letter-spacing: 0.1em !important;
+  }
+
+  .replay-btn {
+    padding: 12px 28px;
+    font-size: 0.75rem;
+  }
+}
+
+/* MOBILE LANDSCAPE SUPPORT (e.g. phones rotated horizontally) */
+@media (max-height: 500px) and (orientation: landscape) {
+  .storybook-narrative-overlay {
+    top: 5% !important;
+  }
+
+  .narrative-basquiat-title {
+    font-size: clamp(0.95rem, 3.5vh, 1.3rem);
+  }
+
+  .ambient-audio-btn {
+    top: 10px;
+  }
+
+  .scroll-indicator-container {
+    bottom: 16px !important;
+  }
+}
+
+
