@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Lenis from 'lenis';
-import { STORY_SCENES } from '../data/storyScenes';
-import { CharacterMan } from './CharacterMan';
-import { CharacterWoman } from './CharacterWoman';
+import React, { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "lenis";
+import { STORY_SCENES } from "../data/storyScenes";
+import { CharacterMan } from "./CharacterMan";
+import { CharacterWoman } from "./CharacterWoman";
 import {
   Scene1Environment,
   Scene2Environment,
@@ -15,17 +15,19 @@ import {
   Scene7Environment,
   Scene8Environment,
   SceneMonoEnvironment
-} from './environments/EditorialEnvironments';
-import { NarrativeOverlay } from './NarrativeOverlay';
-import { ProgressIndicator } from './UI/ProgressIndicator';
-import { AmbientAudio } from './UI/AmbientAudio';
-import { ScrollIndicator } from './UI/ScrollIndicator';
+} from "./environments/EditorialEnvironments";
+import { NarrativeOverlay } from "./NarrativeOverlay";
+import { ProgressIndicator } from "./UI/ProgressIndicator";
+import { AmbientAudio } from "./UI/AmbientAudio";
+import { ScrollIndicator } from "./UI/ScrollIndicator";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export const StoryStage = () => {
   const containerRef = useRef(null);
   const stageRef = useRef(null);
+  const lenisRef = useRef(null);
+  const rafScheduledRef = useRef(false);
 
   // Normalized Scroll Progress (0.0 to 1.0)
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -36,52 +38,55 @@ export const StoryStage = () => {
   const [grayscaleVal, setGrayscaleVal] = useState(0);
   const [hasReachedMonoLock, setHasReachedMonoLock] = useState(false);
 
-  // ANCHOR POSITIONS:
-  // MAN IS ON THE LEFT SIDE (x < 0)
-  // WOMAN IS ON THE RIGHT SIDE (x > 0)
-  // Scene 01: MAN (Left) →    ← WOMAN (Right)
-  //   - Man (Left): flipX = true (faces RIGHT →)
-  //   - Woman (Right): flipX = true (faces LEFT ←)
-  // Scene 03: "We stopped listening." -> BOTH TURN AWAY: MAN (Left) ←    → WOMAN (Right)
-  //   - Man (Left): flipX = false (faces LEFT ←)
-  //   - Woman (Right): flipX = false (faces RIGHT →)
   const [manPos, setManPos] = useState({ x: -340, y: 0, opacity: 1, flipX: false, facingFactor: 1, scale: 0.8, rotation: 0 });
   const [womanPos, setWomanPos] = useState({ x: 340, y: 0, opacity: 1, flipX: true, facingFactor: -1, scale: 0.78, rotation: 0 });
 
   useEffect(() => {
-    // 1. Initialize Lenis Smooth Scroll connected to native window scroll
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-      touchMultiplier: 1.5
-    });
+    // Determine if device is mobile / touch primary
+    const checkIsTouchMobile = () => {
+      if (typeof window === "undefined") return false;
+      const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+      const isSmallScreen = window.innerWidth <= 768;
+      const isCoarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+      return isSmallScreen || (isTouch && isCoarsePointer);
+    };
 
-    function updateLenis(time) {
-      lenis.raf(time * 1000);
+    const isMobileDevice = checkIsTouchMobile();
+
+    // 1. Desktop Lenis Initialization (Only on Desktop/Non-Touch Viewports)
+    let updateLenisTicker = null;
+    if (!isMobileDevice) {
+      const lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+        touchMultiplier: 1.0
+      });
+      lenisRef.current = lenis;
+
+      updateLenisTicker = (time) => {
+        lenis.raf(time * 1000);
+      };
+
+      gsap.ticker.add(updateLenisTicker);
+      lenis.on("scroll", ScrollTrigger.update);
     }
 
-    gsap.ticker.add(updateLenis);
-    lenis.on('scroll', ScrollTrigger.update);
-
-    // 2. Window Scroll & Resize Event Listener & Timeline Calculator
-    const handleScrollUpdate = () => {
+    // 2. High-performance throttled Scroll & Resize Event Calculator using requestAnimationFrame
+    const updateScrollState = () => {
       const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
-      const maxScroll = (containerRef.current?.clientHeight || document.documentElement.scrollHeight) - window.innerHeight;
-      
-      if (maxScroll <= 0) return;
+      const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
+      const totalHeight = containerRef.current?.clientHeight || document.documentElement.scrollHeight;
+      const maxScroll = Math.max(1, totalHeight - viewportHeight);
 
       const windowW = window.innerWidth || 1200;
-      // Calculate responsive screen factor so character horizontal separation scales with viewport width
       let screenFactor = 1.0;
       if (windowW < 1200) {
         screenFactor = Math.max(0.24, Math.min(1.0, windowW / 1200));
       }
 
-      // Fine-grained character scale multiplier across all screen breakpoints
       const mobileScaleMult = windowW < 360 ? 0.62 : windowW < 480 ? 0.72 : windowW < 768 ? 0.84 : windowW < 1024 ? 0.92 : 1.0;
 
-      // Normalized Progress (0.0 -> 1.0)
       const rawProgress = Math.min(1, Math.max(0, scrollY / maxScroll));
       setScrollProgress(rawProgress);
 
@@ -91,22 +96,17 @@ export const StoryStage = () => {
 
       // SCENE SPECIFIC ANIMATIONS DRIVEN CONTINUOUSLY BY SCROLL PROGRESS
       if (rawProgress < 0.0909) {
-        // Scene 01: "We found each other." (0.00 -> 0.09)
-        // MAN (Left) →    ← WOMAN (Right) - Facing each other
         const prog = rawProgress / 0.0909;
         setManPos({ x: (-340 + prog * 240) * screenFactor, y: 0, opacity: 1, facingFactor: 1, scale: 0.8 * mobileScaleMult, rotation: 0 });
         setWomanPos({ x: (340 - prog * 240) * screenFactor, y: 0, opacity: 1, facingFactor: -1, scale: 0.78 * mobileScaleMult, rotation: 0 });
       } else if (rawProgress < 0.1818) {
-        // Scene 02: "We thought it would last." (0.09 -> 0.18)
-        // MAN (Left) →    ← WOMAN (Right) - Facing each other
         const prog = (rawProgress - 0.0909) / 0.0909;
         setManPos({ x: (-100 - Math.sin(prog * Math.PI) * 15) * screenFactor, y: 0, opacity: 1, facingFactor: 1, scale: 0.82 * mobileScaleMult, rotation: 0 });
         setWomanPos({ x: (100 + Math.sin(prog * Math.PI) * 15) * screenFactor, y: 0, opacity: 1, facingFactor: -1, scale: 0.8 * mobileScaleMult, rotation: 0 });
       } else if (rawProgress < 0.2727) {
-        // Scene 03: "We stopped listening." (0.18 -> 0.27)
         const prog = (rawProgress - 0.1818) / 0.0909;
-        const manFacing = Math.cos(prog * Math.PI); // Smoothly interpolates from +1.0 to -1.0
-        const womanFacing = -Math.cos(prog * Math.PI); // Smoothly interpolates from -1.0 to +1.0
+        const manFacing = Math.cos(prog * Math.PI);
+        const womanFacing = -Math.cos(prog * Math.PI);
 
         setManPos({
           x: -100 * screenFactor,
@@ -125,22 +125,18 @@ export const StoryStage = () => {
           scale: 0.8 * mobileScaleMult
         });
       } else if (rawProgress < 0.3636) {
-        // Scene 04: The Separation ("Goodbye.") (0.27 -> 0.36) - MAN (Left) ←    → WOMAN (Right)
         const prog = (rawProgress - 0.2727) / 0.0909;
         setManPos({ x: (-100 - prog * 550) * screenFactor, y: 0, opacity: Math.max(0, 1 - prog * 1.2), facingFactor: -1, scale: 0.8 * mobileScaleMult, rotation: 0 });
         setWomanPos({ x: (100 + prog * 550) * screenFactor, y: 0, opacity: Math.max(0, 1 - prog * 1.2), facingFactor: 1, scale: 0.78 * mobileScaleMult, rotation: 0 });
       } else if (rawProgress < 0.4545) {
-        // Scene 5: Empty Space (0.36 -> 0.45) - Empty room & scarf
         setManPos({ x: -900 * screenFactor, y: 0, opacity: 0, facingFactor: -1, scale: 0.8 * mobileScaleMult, rotation: 0 });
         setWomanPos({ x: 900 * screenFactor, y: 0, opacity: 0, facingFactor: 1, scale: 0.78 * mobileScaleMult, rotation: 0 });
       } else if (rawProgress < 0.5454) {
-        // Scene 6: She's Gone (0.45 -> 0.54) - Night headlights sweep
         const prog = (rawProgress - 0.4545) / 0.0909;
         setSweepProgress(prog);
         setManPos({ x: -900 * screenFactor, y: 0, opacity: 0, facingFactor: -1, scale: 0.8 * mobileScaleMult, rotation: 0 });
         setWomanPos({ x: 900 * screenFactor, y: 0, opacity: 0, facingFactor: 1, scale: 0.78 * mobileScaleMult, rotation: 0 });
       } else if (rawProgress < 0.6363) {
-        // Scene 7: The Search (0.54 -> 0.63) - Horizontal camera journey
         const prog = (rawProgress - 0.5454) / 0.0909;
         setJourneyOffset(prog);
         setSubTextIndex(Math.min(2, Math.floor(prog * 3)));
@@ -154,7 +150,6 @@ export const StoryStage = () => {
           rotation: 0
         });
       } else if (rawProgress < 0.7272) {
-        // Scene 8: Too Late (0.63 -> 0.72) - Pier climax, camera zooms out
         const prog = (rawProgress - 0.6363) / 0.0909;
         setWomanPos({ x: 900 * screenFactor, y: 0, opacity: 0, facingFactor: 1, scale: 0, rotation: 0 });
         setManPos({
@@ -166,7 +161,6 @@ export const StoryStage = () => {
           rotation: 0
         });
       } else if (rawProgress < 0.8181) {
-        // Scene 9: Signature Monochrome Transition (0.72 -> 0.81)
         const prog = (rawProgress - 0.7272) / 0.0909;
         const currentGrayscale = Math.min(100, Math.floor(prog * 100));
         setGrayscaleVal(currentGrayscale);
@@ -178,19 +172,16 @@ export const StoryStage = () => {
         setWomanPos({ x: 900 * screenFactor, y: 0, opacity: 0, facingFactor: 1, scale: 0, rotation: 0 });
         setManPos({ x: 0, y: 0, opacity: 1, facingFactor: -1, scale: 0.3 * mobileScaleMult, rotation: 0 });
       } else if (rawProgress < 0.9090) {
-        // Scene 10: After (0.81 -> 0.90) - Monochrome fog
         setGrayscaleVal(100);
         setHasReachedMonoLock(true);
         setWomanPos({ x: 900 * screenFactor, y: 0, opacity: 0, facingFactor: 1, scale: 0, rotation: 0 });
         setManPos({ x: 0, y: 0, opacity: 0.8, facingFactor: -1, scale: 0.28 * mobileScaleMult, rotation: 0 });
       } else if (rawProgress < 0.9600) {
-        // Scene 11: Memory (0.90 -> 0.96) - Shadow echoes
         setGrayscaleVal(100);
         setHasReachedMonoLock(true);
         setWomanPos({ x: 900 * screenFactor, y: 0, opacity: 0, facingFactor: 1, scale: 0, rotation: 0 });
         setManPos({ x: 0, y: 0, opacity: 0.7, facingFactor: -1, scale: 0.25 * mobileScaleMult, rotation: 0 });
       } else {
-        // Scene 12: The End (0.96 -> 1.00) - Fade out
         const prog = (rawProgress - 0.9600) / 0.0400;
         setGrayscaleVal(100);
         setHasReachedMonoLock(true);
@@ -206,15 +197,42 @@ export const StoryStage = () => {
       }
     };
 
-    window.addEventListener('scroll', handleScrollUpdate, { passive: true });
-    window.addEventListener('resize', handleScrollUpdate, { passive: true });
-    handleScrollUpdate(); // Initial position calculation
+    const handleScrollUpdate = () => {
+      if (!rafScheduledRef.current) {
+        rafScheduledRef.current = true;
+        requestAnimationFrame(() => {
+          rafScheduledRef.current = false;
+          updateScrollState();
+        });
+      }
+    };
+
+    const handleResizeOrOrientation = () => {
+      handleScrollUpdate();
+      setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 100);
+    };
+
+    window.addEventListener("scroll", handleScrollUpdate, { passive: true });
+    window.addEventListener("resize", handleResizeOrOrientation, { passive: true });
+    window.addEventListener("orientationchange", handleResizeOrOrientation, { passive: true });
+
+    // Initial position calculation
+    updateScrollState();
 
     return () => {
-      window.removeEventListener('scroll', handleScrollUpdate);
-      window.removeEventListener('resize', handleScrollUpdate);
-      gsap.ticker.remove(updateLenis);
-      lenis.destroy();
+      window.removeEventListener("scroll", handleScrollUpdate);
+      window.removeEventListener("resize", handleResizeOrOrientation);
+      window.removeEventListener("orientationchange", handleResizeOrOrientation);
+
+      if (updateLenisTicker) {
+        gsap.ticker.remove(updateLenisTicker);
+      }
+      if (lenisRef.current) {
+        lenisRef.current.destroy();
+        lenisRef.current = null;
+      }
     };
   }, []);
 
@@ -231,7 +249,7 @@ export const StoryStage = () => {
 
   const sceneSegment = 1 / STORY_SCENES.length;
   const currentSceneProgress = (scrollProgress % sceneSegment) / sceneSegment;
-  
+
   let narrativeOpacity = 0;
   if (currentSceneProgress < 0.12) {
     narrativeOpacity = currentSceneProgress / 0.12;
@@ -244,7 +262,7 @@ export const StoryStage = () => {
   }
 
   const handleReplay = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -266,7 +284,7 @@ export const StoryStage = () => {
         style={{
           filter: `grayscale(${activeGrayscale}%)`,
           backgroundColor: currentScene.bgColor,
-          transition: 'background-color 0.8s cubic-bezier(0.16, 1, 0.3, 1)'
+          transition: "background-color 0.8s cubic-bezier(0.16, 1, 0.3, 1)"
         }}
       >
         {/* Narrative Overlay */}
@@ -274,40 +292,40 @@ export const StoryStage = () => {
 
         {/* Continuous In-Viewport Scene Environments Layer */}
         <div className="parallax-layer environment-layer" style={{ zIndex: 10 }}>
-          <div style={{ position: 'absolute', inset: 0, opacity: getSceneOpacity(0), transition: 'opacity 0.2s linear' }}>
+          <div style={{ position: "absolute", inset: 0, opacity: getSceneOpacity(0), transition: "opacity 0.2s linear" }}>
             <Scene1Environment />
           </div>
-          <div style={{ position: 'absolute', inset: 0, opacity: getSceneOpacity(1), transition: 'opacity 0.2s linear' }}>
+          <div style={{ position: "absolute", inset: 0, opacity: getSceneOpacity(1), transition: "opacity 0.2s linear" }}>
             <Scene2Environment />
           </div>
-          <div style={{ position: 'absolute', inset: 0, opacity: getSceneOpacity(2), transition: 'opacity 0.2s linear' }}>
+          <div style={{ position: "absolute", inset: 0, opacity: getSceneOpacity(2), transition: "opacity 0.2s linear" }}>
             <Scene3Environment />
           </div>
-          <div style={{ position: 'absolute', inset: 0, opacity: getSceneOpacity(3), transition: 'opacity 0.2s linear' }}>
+          <div style={{ position: "absolute", inset: 0, opacity: getSceneOpacity(3), transition: "opacity 0.2s linear" }}>
             <Scene4Environment />
           </div>
-          <div style={{ position: 'absolute', inset: 0, opacity: getSceneOpacity(4), transition: 'opacity 0.2s linear' }}>
+          <div style={{ position: "absolute", inset: 0, opacity: getSceneOpacity(4), transition: "opacity 0.2s linear" }}>
             <Scene5Environment />
           </div>
-          <div style={{ position: 'absolute', inset: 0, opacity: getSceneOpacity(5), transition: 'opacity 0.2s linear' }}>
+          <div style={{ position: "absolute", inset: 0, opacity: getSceneOpacity(5), transition: "opacity 0.2s linear" }}>
             <Scene6Environment sweepProgress={sweepProgress} />
           </div>
-          <div style={{ position: 'absolute', inset: 0, opacity: getSceneOpacity(6), transition: 'opacity 0.2s linear' }}>
+          <div style={{ position: "absolute", inset: 0, opacity: getSceneOpacity(6), transition: "opacity 0.2s linear" }}>
             <Scene7Environment journeyOffset={journeyOffset} />
           </div>
-          <div style={{ position: 'absolute', inset: 0, opacity: getSceneOpacity(7), transition: 'opacity 0.2s linear' }}>
+          <div style={{ position: "absolute", inset: 0, opacity: getSceneOpacity(7), transition: "opacity 0.2s linear" }}>
             <Scene8Environment />
           </div>
-          <div style={{ position: 'absolute', inset: 0, opacity: getSceneOpacity(8), transition: 'opacity 0.2s linear' }}>
+          <div style={{ position: "absolute", inset: 0, opacity: getSceneOpacity(8), transition: "opacity 0.2s linear" }}>
             <SceneMonoEnvironment sceneId={9} />
           </div>
-          <div style={{ position: 'absolute', inset: 0, opacity: getSceneOpacity(9), transition: 'opacity 0.2s linear' }}>
+          <div style={{ position: "absolute", inset: 0, opacity: getSceneOpacity(9), transition: "opacity 0.2s linear" }}>
             <SceneMonoEnvironment sceneId={10} />
           </div>
-          <div style={{ position: 'absolute', inset: 0, opacity: getSceneOpacity(10), transition: 'opacity 0.2s linear' }}>
+          <div style={{ position: "absolute", inset: 0, opacity: getSceneOpacity(10), transition: "opacity 0.2s linear" }}>
             <SceneMonoEnvironment sceneId={11} />
           </div>
-          <div style={{ position: 'absolute', inset: 0, opacity: getSceneOpacity(11), transition: 'opacity 0.2s linear' }}>
+          <div style={{ position: "absolute", inset: 0, opacity: getSceneOpacity(11), transition: "opacity 0.2s linear" }}>
             <SceneMonoEnvironment sceneId={12} />
           </div>
         </div>
@@ -317,22 +335,22 @@ export const StoryStage = () => {
           className="parallax-layer character-layer"
           style={{
             zIndex: 30,
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'center',
-            height: '100%',
-            paddingBottom: '10vh'
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "center",
+            height: "100%",
+            paddingBottom: "10vh"
           }}
         >
-          <div className="character-stage-wrapper" style={{ position: 'relative', width: '100%', maxWidth: '1200px', height: '65vh' }}>
+          <div className="character-stage-wrapper" style={{ position: "relative", width: "100%", maxWidth: "1200px", height: "65vh" }}>
             {/* Man Character (On LEFT Side: x < 0) */}
             <div
               style={{
-                position: 'absolute',
-                bottom: '0',
-                left: '50%',
+                position: "absolute",
+                bottom: "0",
+                left: "50%",
                 transform: `translate3d(calc(-50% + ${manPos.x}px), ${manPos.y}px, 0)`,
-                willChange: 'transform, opacity'
+                willChange: "transform, opacity"
               }}
             >
               <CharacterMan
@@ -348,11 +366,11 @@ export const StoryStage = () => {
             {/* Woman Character (On RIGHT Side: x > 0) */}
             <div
               style={{
-                position: 'absolute',
-                bottom: '0',
-                left: '50%',
+                position: "absolute",
+                bottom: "0",
+                left: "50%",
                 transform: `translate3d(calc(-50% + ${womanPos.x}px), ${womanPos.y}px, 0)`,
-                willChange: 'transform, opacity'
+                willChange: "transform, opacity"
               }}
             >
               <CharacterWoman
@@ -371,24 +389,24 @@ export const StoryStage = () => {
         {currentScene.id === 12 && (
           <div
             style={{
-              position: 'absolute',
-              bottom: '15%',
-              left: '50%',
-              transform: 'translateX(-50%)',
+              position: "absolute",
+              bottom: "15%",
+              left: "50%",
+              transform: "translateX(-50%)",
               zIndex: 100,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '20px'
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "20px"
             }}
           >
             <h2
               style={{
-                fontFamily: 'var(--font-serif)',
-                fontSize: '2rem',
-                color: '#E0E0E0',
-                letterSpacing: '0.2em',
-                fontWeight: '300'
+                fontFamily: "var(--font-serif)",
+                fontSize: "2rem",
+                color: "#E0E0E0",
+                letterSpacing: "0.2em",
+                fontWeight: "300"
               }}
             >
               THE END
