@@ -74,7 +74,8 @@ export const StoryStage = () => {
 
     // 2. High-performance throttled Scroll & Resize Event Calculator using requestAnimationFrame
     const updateScrollState = () => {
-      const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+      const rawScrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+      const scrollY = Math.max(0, rawScrollY);
       const viewportHeight = document.documentElement.clientHeight || window.innerHeight;
       const totalHeight = containerRef.current?.clientHeight || document.documentElement.scrollHeight;
       const maxScroll = Math.max(1, totalHeight - viewportHeight);
